@@ -4,13 +4,21 @@ const chat = document.getElementById("chat");
 const msgs = document.getElementById("msgs");
 const presence = document.getElementById("presence-indicator");
 let allChat = [];
+const socket = io("http://localhost:8080");
+socket.on("connect", () => {
+  console.log("connected");
+  presence.innerText = "🟢";
+});
 
-/*
- *
- * Code goes here
- *
- */
+socket.on("msg:get", (data) => {
+  allChat = data.msg;
+  render();
+});
 
+socket.on("disconnect", () => {
+  console.log("disconnected");
+  presence.innerText = "🔴";
+});
 chat.addEventListener("submit", function (e) {
   e.preventDefault();
   postNewMsg(chat.elements.user.value, chat.elements.text.value);
@@ -18,11 +26,7 @@ chat.addEventListener("submit", function (e) {
 });
 
 async function postNewMsg(user, text) {
-  /*
-   *
-   * Code goes here
-   *
-   */
+  socket.emit("msg:post", { user, text });
 }
 
 function render() {
